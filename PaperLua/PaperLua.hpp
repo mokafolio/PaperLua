@@ -253,7 +253,8 @@ namespace paperLua
         groupCW.
         addBase<Item>().
         addMemberFunction("setClipped", LUANATIC_FUNCTION(&Group::setClipped)).
-        addMemberFunction("isClipped", LUANATIC_FUNCTION(&Group::isClipped));
+        addMemberFunction("isClipped", LUANATIC_FUNCTION(&Group::isClipped)).
+        addMemberFunction("clone", LUANATIC_FUNCTION(&Group::clone));
 
         namespaceTable.registerClass(groupCW);
 
@@ -296,7 +297,8 @@ namespace paperLua
         addMemberFunction("area", LUANATIC_FUNCTION(&Path::area)).
         addMemberFunction("isClosed", LUANATIC_FUNCTION(&Path::isClosed)).
         addMemberFunction("isClockwise", LUANATIC_FUNCTION(&Path::isClockwise)).
-        addMemberFunction("contains", LUANATIC_FUNCTION(&Path::contains));
+        addMemberFunction("contains", LUANATIC_FUNCTION(&Path::contains)).
+        addMemberFunction("clone", LUANATIC_FUNCTION(&Path::clone));
 
         namespaceTable.registerClass(pathCW);
 
