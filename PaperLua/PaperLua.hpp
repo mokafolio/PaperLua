@@ -245,7 +245,8 @@ namespace paperLua
         addMemberFunction("hasFill", LUANATIC_FUNCTION(&Item::hasFill)).
         addMemberFunction("clone", LUANATIC_FUNCTION(&Item::clone)).
         addMemberFunction("document", LUANATIC_FUNCTION(&Item::document)).
-        addMemberFunction("itemType", LUANATIC_FUNCTION(&Item::itemType));
+        addMemberFunction("itemType", LUANATIC_FUNCTION(&Item::itemType)).
+        addMemberFunction("children", LUANATIC_RETURN_REF_ITERATOR(&Item::children));
 
         namespaceTable.registerClass(itemCW);
 
