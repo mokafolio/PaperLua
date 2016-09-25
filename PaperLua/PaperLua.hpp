@@ -199,7 +199,7 @@ namespace paperLua
         addMemberFunction("scaleAroundTransform", LUANATIC_FUNCTION_OVERLOAD(void(Item::*)(const Vec2f &, const Vec2f&), &Item::scaleTransform)).
         addMemberFunction("rotateTransform", LUANATIC_FUNCTION_OVERLOAD(void(Item::*)(Float), &Item::rotateTransform)).
         addMemberFunction("rotateAroundTransform", LUANATIC_FUNCTION_OVERLOAD(void(Item::*)(Float, const Vec2f &), &Item::rotateTransform)).
-        addMemberFunction("transformItem", LUANATIC_FUNCTION_OVERLOAD(void(Item::*)(const Mat3f &), &Item::transform)).
+        addMemberFunction("transformItem", LUANATIC_FUNCTION_OVERLOAD(void(Item::*)(const Mat3f &, bool), &Item::transform)).
         addMemberFunction("translate", LUANATIC_FUNCTION_OVERLOAD(void(Item::*)(const Vec2f &), &Item::translate)).
         addMemberFunction("scale", LUANATIC_FUNCTION_OVERLOAD(void(Item::*)(const Vec2f &), &Item::scale)).
         addMemberFunction("rotate", LUANATIC_FUNCTION_OVERLOAD(void(Item::*)(Float), &Item::rotate)).
