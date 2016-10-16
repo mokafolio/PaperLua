@@ -28,7 +28,7 @@ namespace paperLua
             }
             else
             {
-                luanatic::push<paper::Document>(_state, state->m_allocator->create<paper::Document>(paper::createDocument()), true);
+                luanatic::push<paper::Document>(_state, state->m_allocator->create<paper::Document>(createDocument()), true);
             }
             return 1;
         }
@@ -43,7 +43,7 @@ namespace paperLua
             else
             {
                 String * str = convertToTypeAndCheck<String>(_state, 2);
-                if(str)
+                if (str)
                 {
                     pushValueType<Error>(_state, doc->saveSVG(URI(*str)));
                 }
@@ -93,6 +93,12 @@ namespace paperLua
         entityTypeTable["Document"].set(EntityType::Document);
         entityTypeTable["Path"].set(EntityType::Path);
         entityTypeTable["Group"].set(EntityType::Group);
+
+        LuaValue paintTypeTable = namespaceTable.findOrCreateTable("PaintType");
+        paintTypeTable["None"].set(PaintType::None);
+        paintTypeTable["Color"].set(PaintType::Color);
+        paintTypeTable["LinearGradient"].set(PaintType::LinearGradient);
+        paintTypeTable["CircularGradient"].set(PaintType::CircularGradient);
 
         LuaValue smoothingTypeTable = namespaceTable.findOrCreateTable("Smoothing");
         smoothingTypeTable["Continuous"].set(Smoothing::Continuous);
@@ -172,13 +178,37 @@ namespace paperLua
 
         namespaceTable.registerClass(curveCW);
 
+        ClassWrapper<Paint> paintCW("Paint");
+        paintCW.
+        addMemberFunction("clone", LUANATIC_FUNCTION(&Paint::clone)).
+        addMemberFunction("paintType", LUANATIC_FUNCTION(&Paint::paintType)).
+        addMemberFunction("remove", LUANATIC_FUNCTION(&Paint::remove));
+
+        namespaceTable.registerClass(paintCW);
+
+        ClassWrapper<NoPaint> noPaintCW("NoPaint");
+        noPaintCW.
+        addBase<Paint>().
+        addMemberFunction("clone", LUANATIC_FUNCTION(&NoPaint::clone));
+
+        namespaceTable.registerClass(noPaintCW);
+
+        ClassWrapper<ColorPaint> colorPaintCW("ColorPaint");
+        colorPaintCW.
+        addBase<Paint>().
+        addMemberFunction("clone", LUANATIC_FUNCTION(&ColorPaint::clone)).
+        addMemberFunction("setColor", LUANATIC_FUNCTION(&ColorPaint::setColor)).
+        addMemberFunction("color", LUANATIC_FUNCTION(&ColorPaint::color));
+
+        namespaceTable.registerClass(colorPaintCW);
+
 
         ClassWrapper<brick::Entity> entityCW("Entity");
         namespaceTable.registerClass(entityCW);
 
         ClassWrapper<Item> itemCW("Item");
         itemCW.
-        addBase<brick::Entity>().
+        //addBase<brick::Entity>().
         addMemberFunction("addChild", LUANATIC_FUNCTION(&Item::addChild)).
         addMemberFunction("insertAbove", LUANATIC_FUNCTION(&Item::insertAbove)).
         addMemberFunction("insertBelow", LUANATIC_FUNCTION(&Item::insertBelow)).
@@ -196,7 +226,7 @@ namespace paperLua
         addMemberFunction("setTransform", LUANATIC_FUNCTION(&Item::setTransform)).
         addMemberFunction("translateTransform", LUANATIC_FUNCTION_OVERLOAD(void(Item::*)(const Vec2f &), &Item::translateTransform)).
         addMemberFunction("scaleTransform", LUANATIC_FUNCTION_OVERLOAD(void(Item::*)(const Vec2f &), &Item::scaleTransform)).
-        addMemberFunction("scaleAroundTransform", LUANATIC_FUNCTION_OVERLOAD(void(Item::*)(const Vec2f &, const Vec2f&), &Item::scaleTransform)).
+        addMemberFunction("scaleAroundTransform", LUANATIC_FUNCTION_OVERLOAD(void(Item::*)(const Vec2f &, const Vec2f &), &Item::scaleTransform)).
         addMemberFunction("rotateTransform", LUANATIC_FUNCTION_OVERLOAD(void(Item::*)(Float), &Item::rotateTransform)).
         addMemberFunction("rotateAroundTransform", LUANATIC_FUNCTION_OVERLOAD(void(Item::*)(Float, const Vec2f &), &Item::rotateTransform)).
         addMemberFunction("transformItem", LUANATIC_FUNCTION_OVERLOAD(void(Item::*)(const Mat3f &, bool), &Item::transform)).
@@ -228,7 +258,7 @@ namespace paperLua
         addMemberFunction("setStrokeScaling", LUANATIC_FUNCTION(&Item::setStrokeScaling)).
         addMemberFunction("setStroke", LUANATIC_FUNCTION(&Item::setStroke)).
         addMemberFunction("removeStroke", LUANATIC_FUNCTION(&Item::removeStroke)).
-        addMemberFunction("setFill", LUANATIC_FUNCTION(&Item::setFill)).
+        addMemberFunction("setFill", LUANATIC_FUNCTION_OVERLOAD(Paint(Item::*)(const ColorRGBA &), &Item::setFill)).
         addMemberFunction("removeFill", LUANATIC_FUNCTION(&Item::removeFill)).
         addMemberFunction("setWindingRule", LUANATIC_FUNCTION(&Item::setWindingRule)).
         addMemberFunction("strokeJoin", LUANATIC_FUNCTION(&Item::strokeJoin)).
