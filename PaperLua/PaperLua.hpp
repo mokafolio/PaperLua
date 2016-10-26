@@ -18,6 +18,43 @@ namespace paperLua
         using namespace luanatic;
         using namespace paper;
 
+        inline Int32 luaEntityType(lua_State * _state)
+        {
+            brick::TypedEntity * e = convertToTypeAndCheck<brick::TypedEntity>(_state, 1);
+            lua_pushlightuserdata(_state, e->entityType());
+            return 1;
+        }
+
+        inline Int32 luaEntityCast(lua_State * _state)
+        {
+            luanatic::detail::LuanaticState * state = luanatic::detail::luanaticState(_state);
+            STICK_ASSERT(state);
+            if (lua_istable(_state, 1) && lua_isuserdata(_state, 2))
+            {
+                printf("GOT TABLE AND USERDATA!\n");
+                lua_getfield(_state, 1, "__entityType"); // 1 2 et
+                if (lua_isuserdata(_state, -1))
+                {
+                    printf("GOT __entityType!\n");
+                    //lua_pushvalue(_state, 2);
+                    printf("DEAD\n");
+                    brick::TypedEntity * e = convertToTypeAndCheck<brick::TypedEntity>(_state, 2);
+                    if (lua_touserdata(_state, -1) == e->entityType())
+                    {
+                        printf("CAN CAST BRO!\n");
+                        lua_pushvalue(_state, 1); // 1 2 et 1
+                        lua_setmetatable(_state, 2); // 1 2 et
+                        lua_pop(_state, 1); // 1 2
+                        return 1;
+                    }
+                }
+            }
+
+            printf("CAST FAILED!\n");
+            lua_pushnil(_state); // 1 2 nil
+            return 1;
+        }
+
         inline Int32 luaCreateDocument(lua_State * _state)
         {
             luanatic::detail::LuanaticState * state = luanatic::detail::luanaticState(_state);
@@ -178,8 +215,16 @@ namespace paperLua
 
         namespaceTable.registerClass(curveCW);
 
+        ClassWrapper<brick::TypedEntity> entityCW("TypedEntity");
+        entityCW.
+        addMemberFunction("entityType", detail::luaEntityType);
+
+        namespaceTable.registerClass(entityCW);
+        namespaceTable.registerFunction("entityCast", detail::luaEntityCast);
+
         ClassWrapper<Paint> paintCW("Paint");
         paintCW.
+        addBase<brick::TypedEntity>().
         addMemberFunction("clone", LUANATIC_FUNCTION(&Paint::clone)).
         addMemberFunction("paintType", LUANATIC_FUNCTION(&Paint::paintType)).
         addMemberFunction("remove", LUANATIC_FUNCTION(&Paint::remove));
@@ -192,6 +237,7 @@ namespace paperLua
         addMemberFunction("clone", LUANATIC_FUNCTION(&NoPaint::clone));
 
         namespaceTable.registerClass(noPaintCW);
+        namespaceTable["NoPaint"]["__entityType"].set(stick::TypeInfoT<NoPaint>::typeID());
 
         ClassWrapper<ColorPaint> colorPaintCW("ColorPaint");
         colorPaintCW.
@@ -201,14 +247,11 @@ namespace paperLua
         addMemberFunction("color", LUANATIC_FUNCTION(&ColorPaint::color));
 
         namespaceTable.registerClass(colorPaintCW);
-
-
-        ClassWrapper<brick::Entity> entityCW("Entity");
-        namespaceTable.registerClass(entityCW);
+        namespaceTable["ColorPaint"]["__entityType"].set(stick::TypeInfoT<ColorPaint>::typeID());
 
         ClassWrapper<Item> itemCW("Item");
         itemCW.
-        //addBase<brick::Entity>().
+        addBase<brick::TypedEntity>().
         addMemberFunction("addChild", LUANATIC_FUNCTION(&Item::addChild)).
         addMemberFunction("insertAbove", LUANATIC_FUNCTION(&Item::insertAbove)).
         addMemberFunction("insertBelow", LUANATIC_FUNCTION(&Item::insertBelow)).
@@ -288,6 +331,7 @@ namespace paperLua
         addMemberFunction("clone", LUANATIC_FUNCTION(&Group::clone));
 
         namespaceTable.registerClass(groupCW);
+        namespaceTable["Group"]["__entityType"].set(stick::TypeInfoT<Group>::typeID());
 
         ClassWrapper<Path> pathCW("Path");
         pathCW.
@@ -332,6 +376,7 @@ namespace paperLua
         addMemberFunction("clone", LUANATIC_FUNCTION(&Path::clone));
 
         namespaceTable.registerClass(pathCW);
+        namespaceTable["Path"]["__entityType"].set(stick::TypeInfoT<Path>::typeID());
 
         ClassWrapper<Document> docCW("Document");
         docCW.
@@ -349,6 +394,7 @@ namespace paperLua
         addMemberFunction("saveSVG", detail::luaSaveSVG);
 
         namespaceTable.registerClass(docCW);
+        namespaceTable["Document"]["__entityType"].set(stick::TypeInfoT<Document>::typeID());
         namespaceTable.registerFunction("createDocument", detail::luaCreateDocument);
 
         ClassWrapper<RenderInterface> rendererCW("RenderInterface");
