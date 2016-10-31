@@ -43,8 +43,13 @@ namespace paperLua
                     {
                         printf("CAN CAST BRO!\n");
                         lua_pushvalue(_state, 1); // 1 2 et 1
-                        lua_setmetatable(_state, 2); // 1 2 et
+                        lua_setmetatable(_state, -3); // 1 2 et
                         lua_pop(_state, 1); // 1 2
+
+                        luanatic::detail::UserData * ud = static_cast<luanatic::detail::UserData*>(lua_touserdata(_state, 2));
+                        lua_getfield(_state, 1, "__typeID");
+                        ud->m_typeID = reinterpret_cast<stick::TypeID>(lua_tointeger(_state, -1));
+                        lua_pop(_state, 1);
                         return 1;
                     }
                 }
@@ -319,7 +324,7 @@ namespace paperLua
         addMemberFunction("clone", LUANATIC_FUNCTION(&Item::clone)).
         addMemberFunction("document", LUANATIC_FUNCTION(&Item::document)).
         addMemberFunction("itemType", LUANATIC_FUNCTION(&Item::itemType)).
-        addMemberFunction("children", LUANATIC_RETURN_REF_ITERATOR(&Item::children));
+        addMemberFunction("children", LUANATIC_FUNCTION(&Item::children, ReturnRefIterator<ph::Result>));
 
         namespaceTable.registerClass(itemCW);
 
@@ -354,8 +359,8 @@ namespace paperLua
         addMemberFunction("removeSegmentsFrom", LUANATIC_FUNCTION_OVERLOAD(void(Path::*)(Size), &Path::removeSegments)).
         addMemberFunction("removeSegmentsFromTo", LUANATIC_FUNCTION_OVERLOAD(void(Path::*)(Size, Size), &Path::removeSegments)).
         addMemberFunction("removeSegments", LUANATIC_FUNCTION_OVERLOAD(void(Path::*)(), &Path::removeSegments)).
-        addMemberFunction("segments", LUANATIC_RETURN_REF_ITERATOR_OVERLOAD(SegmentArray & (Path::*)(), &Path::segments)).
-        addMemberFunction("curves", LUANATIC_RETURN_REF_ITERATOR_OVERLOAD(CurveArray & (Path::*)(), &Path::curves)).
+        addMemberFunction("segments", LUANATIC_FUNCTION_OVERLOAD(SegmentArray & (Path::*)(), &Path::segments, ReturnRefIterator<ph::Result>)).
+        addMemberFunction("curves", LUANATIC_FUNCTION_OVERLOAD(CurveArray & (Path::*)(), &Path::curves, ReturnRefIterator<ph::Result>)).
         addMemberFunction("positionAt", LUANATIC_FUNCTION(&Path::positionAt)).
         addMemberFunction("normalAt", LUANATIC_FUNCTION(&Path::normalAt)).
         addMemberFunction("tangentAt", LUANATIC_FUNCTION(&Path::tangentAt)).
