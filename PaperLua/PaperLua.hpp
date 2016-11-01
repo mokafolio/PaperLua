@@ -31,31 +31,25 @@ namespace paperLua
             STICK_ASSERT(state);
             if (lua_istable(_state, 1) && lua_isuserdata(_state, 2))
             {
-                printf("GOT TABLE AND USERDATA!\n");
                 lua_getfield(_state, 1, "__entityType"); // 1 2 et
                 if (lua_isuserdata(_state, -1))
                 {
-                    printf("GOT __entityType!\n");
-                    //lua_pushvalue(_state, 2);
-                    printf("DEAD\n");
                     brick::TypedEntity * e = convertToTypeAndCheck<brick::TypedEntity>(_state, 2);
                     if (lua_touserdata(_state, -1) == e->entityType())
                     {
-                        printf("CAN CAST BRO!\n");
                         lua_pushvalue(_state, 1); // 1 2 et 1
                         lua_setmetatable(_state, -3); // 1 2 et
                         lua_pop(_state, 1); // 1 2
 
                         luanatic::detail::UserData * ud = static_cast<luanatic::detail::UserData*>(lua_touserdata(_state, 2));
                         lua_getfield(_state, 1, "__typeID");
-                        ud->m_typeID = reinterpret_cast<stick::TypeID>(lua_tointeger(_state, -1));
+                        ud->m_typeID = reinterpret_cast<stick::TypeID>(lua_touserdata(_state, -1));
                         lua_pop(_state, 1);
                         return 1;
                     }
                 }
             }
-
-            printf("CAST FAILED!\n");
+            
             lua_pushnil(_state); // 1 2 nil
             return 1;
         }
