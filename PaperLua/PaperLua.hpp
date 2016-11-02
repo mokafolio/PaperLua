@@ -353,8 +353,8 @@ namespace paperLua
         addMemberFunction("removeSegmentsFrom", LUANATIC_FUNCTION_OVERLOAD(void(Path::*)(Size), &Path::removeSegments)).
         addMemberFunction("removeSegmentsFromTo", LUANATIC_FUNCTION_OVERLOAD(void(Path::*)(Size, Size), &Path::removeSegments)).
         addMemberFunction("removeSegments", LUANATIC_FUNCTION_OVERLOAD(void(Path::*)(), &Path::removeSegments)).
-        addMemberFunction("segments", LUANATIC_FUNCTION_OVERLOAD(SegmentArray & (Path::*)(), &Path::segments, ReturnRefIterator<ph::Result>)).
-        addMemberFunction("curves", LUANATIC_FUNCTION_OVERLOAD(CurveArray & (Path::*)(), &Path::curves, ReturnRefIterator<ph::Result>)).
+        addMemberFunction("segments", LUANATIC_FUNCTION_OVERLOAD(Path::SegmentView (Path::*)(), &Path::segments, ReturnRefIterator<ph::Result>)).
+        addMemberFunction("curves", LUANATIC_FUNCTION_OVERLOAD(Path::CurveView (Path::*)(), &Path::curves, ReturnRefIterator<ph::Result>)).
         addMemberFunction("positionAt", LUANATIC_FUNCTION(&Path::positionAt)).
         addMemberFunction("normalAt", LUANATIC_FUNCTION(&Path::normalAt)).
         addMemberFunction("tangentAt", LUANATIC_FUNCTION(&Path::tangentAt)).
