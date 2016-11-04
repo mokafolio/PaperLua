@@ -209,6 +209,8 @@ namespace paperLua
         addMemberFunction("isColinear", LUANATIC_FUNCTION(&Curve::isColinear)).
         addMemberFunction("length", LUANATIC_FUNCTION(&Curve::length)).
         addMemberFunction("area", LUANATIC_FUNCTION(&Curve::area)).
+        addMemberFunction("divideAt", LUANATIC_FUNCTION(&Curve::divideAt)).
+        addMemberFunction("divideAtParameter", LUANATIC_FUNCTION(&Curve::divideAtParameter)).
         addMemberFunction("bounds", LUANATIC_FUNCTION_OVERLOAD(const Rect & (Curve::*)()const, &Curve::bounds)).
         addMemberFunction("boundsWithPadding", LUANATIC_FUNCTION_OVERLOAD(Rect(Curve::*)(Float)const, &Curve::bounds));
 
@@ -372,6 +374,8 @@ namespace paperLua
         addMemberFunction("isClosed", LUANATIC_FUNCTION(&Path::isClosed)).
         addMemberFunction("isClockwise", LUANATIC_FUNCTION(&Path::isClockwise)).
         addMemberFunction("contains", LUANATIC_FUNCTION(&Path::contains)).
+        addMemberFunction("segment", LUANATIC_FUNCTION_OVERLOAD(Segment&(Path::*)(stick::Size), &Path::segment)).
+        addMemberFunction("curve", LUANATIC_FUNCTION_OVERLOAD(Curve&(Path::*)(stick::Size), &Path::curve)).
         addMemberFunction("clone", LUANATIC_FUNCTION(&Path::clone));
 
         namespaceTable.registerClass(pathCW);
