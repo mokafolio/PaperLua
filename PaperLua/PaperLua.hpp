@@ -34,8 +34,9 @@ namespace paperLua
                 lua_getfield(_state, 1, "__entityType"); // 1 2 et
                 if (lua_isuserdata(_state, -1))
                 {
-                    brick::TypedEntity * e = convertToTypeAndCheck<brick::TypedEntity>(_state, 2);
-                    if (lua_touserdata(_state, -1) == e->entityType())
+                    brick::Entity * e = convertToTypeAndCheck<brick::Entity>(_state, 2);
+                    auto maybe = e->maybe<brick::detail::EntityTypeHolder>();
+                    if (maybe && lua_touserdata(_state, -1) == *maybe)
                     {
                         lua_pushvalue(_state, 1); // 1 2 et 1
                         lua_setmetatable(_state, -3); // 1 2 et
@@ -216,16 +217,27 @@ namespace paperLua
 
         namespaceTable.registerClass(curveCW);
 
-        ClassWrapper<brick::TypedEntity> entityCW("TypedEntity");
-        entityCW.
+
+        ClassWrapper<brick::Entity> entityCW("Entity");
+
+        ClassWrapper<brick::TypedEntity> typedEntityCW("TypedEntity");
+        typedEntityCW.
+        addBase<brick::Entity>().
+        addMemberFunction("entityType", detail::luaEntityType);
+
+        ClassWrapper<brick::SharedTypedEntity> sharedTypedEntityCW("SharedTypedEntity");
+        sharedTypedEntityCW.
+        addBase<brick::Entity>().
         addMemberFunction("entityType", detail::luaEntityType);
 
         namespaceTable.registerClass(entityCW);
+        namespaceTable.registerClass(typedEntityCW);
+        namespaceTable.registerClass(sharedTypedEntityCW);
         namespaceTable.registerFunction("entityCast", detail::luaEntityCast);
 
         ClassWrapper<Paint> paintCW("Paint");
         paintCW.
-        addBase<brick::TypedEntity>().
+        addBase<brick::SharedTypedEntity>().
         addMemberFunction("clone", LUANATIC_FUNCTION(&Paint::clone)).
         addMemberFunction("paintType", LUANATIC_FUNCTION(&Paint::paintType)).
         addMemberFunction("remove", LUANATIC_FUNCTION(&Paint::remove));
