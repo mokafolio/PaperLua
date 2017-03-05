@@ -54,7 +54,7 @@ const Suite spec[] =
                 "renderer:setViewport(100, 100)\n"
                 "local p = doc:createCircle(Vec2.fromNumbers(100, 100), 10, \"Circle\")\n"
                 "local val = p:normalAt(p:length() * 0.5)\n"
-                "p:setFill(ColorRGBA.fromNumbers(1, 0, 0, 1))\n";
+                "p:setFill(ColorRGBA(1, 0, 0, 1))\n";
 
             auto err = luanatic::execute(state, basicTest);
             if (err)

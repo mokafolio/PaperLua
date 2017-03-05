@@ -29,15 +29,23 @@ namespace paperLua
         {
             luanatic::detail::LuanaticState * state = luanatic::detail::luanaticState(_state);
             STICK_ASSERT(state);
+            printf("EC A\n");
             if (lua_istable(_state, 1) && lua_isuserdata(_state, 2))
             {
                 lua_getfield(_state, 1, "__entityType"); // 1 2 et
                 if (lua_isuserdata(_state, -1))
                 {
+                    printf("EC B\n");
                     brick::Entity * e = convertToTypeAndCheck<brick::Entity>(_state, 2);
+                    STICK_ASSERT(e);
+                    printf("INFO: %lu %lu %p %p\n", e->id(), e->version(), e->hub(), e);
+                    STICK_ASSERT(e->isValid());
+                    printf("EC B2\n");
                     auto maybe = e->maybe<brick::detail::EntityTypeHolder>();
+                    printf("EC C\n");
                     if (maybe && lua_touserdata(_state, -1) == *maybe)
                     {
+                        printf("EC C2\n");
                         lua_pushvalue(_state, 1); // 1 2 et 1
                         lua_setmetatable(_state, -3); // 1 2 et
                         lua_pop(_state, 1); // 1 2
@@ -51,6 +59,7 @@ namespace paperLua
                 }
             }
 
+            printf("EC D\n");
             lua_pushnil(_state); // 1 2 nil
             return 1;
         }
@@ -160,7 +169,7 @@ namespace paperLua
 
         ClassWrapper<CurveLocation> curveLocationCW("CurveLocation");
         curveLocationCW.
-        addConstructor("new").
+        //addConstructor("new").
         addMemberFunction("position", LUANATIC_FUNCTION(&CurveLocation::position)).
         addMemberFunction("normal", LUANATIC_FUNCTION(&CurveLocation::normal)).
         addMemberFunction("tangent", LUANATIC_FUNCTION(&CurveLocation::tangent)).
@@ -312,9 +321,15 @@ namespace paperLua
         addMemberFunction("setDashArray", LUANATIC_FUNCTION(&Item::setDashArray)).
         addMemberFunction("setDashOffset", LUANATIC_FUNCTION(&Item::setDashOffset)).
         addMemberFunction("setStrokeScaling", LUANATIC_FUNCTION(&Item::setStrokeScaling)).
-        addMemberFunction("setStroke", LUANATIC_FUNCTION(&Item::setStroke)).
+        addMemberFunction("setStrokeFromColor", LUANATIC_FUNCTION_OVERLOAD(Paint(Item::*)(const ColorRGBA &), &Item::setStroke)).
+        addMemberFunction("setStrokeFromString", LUANATIC_FUNCTION_OVERLOAD(Paint(Item::*)(const stick::String &), &Item::setStroke)).
+        addMemberFunction("setStroke", LUANATIC_FUNCTION_OVERLOAD(Paint(Item::*)(const ColorRGBA &), &Item::setStroke)).
+        addMemberFunction("setStroke", LUANATIC_FUNCTION_OVERLOAD(Paint(Item::*)(const stick::String &), &Item::setStroke)).
         addMemberFunction("removeStroke", LUANATIC_FUNCTION(&Item::removeStroke)).
+        addMemberFunction("setFillFromColor", LUANATIC_FUNCTION_OVERLOAD(Paint(Item::*)(const ColorRGBA &), &Item::setFill)).
+        addMemberFunction("setFillFromString", LUANATIC_FUNCTION_OVERLOAD(Paint(Item::*)(const stick::String &), &Item::setFill)).
         addMemberFunction("setFill", LUANATIC_FUNCTION_OVERLOAD(Paint(Item::*)(const ColorRGBA &), &Item::setFill)).
+        addMemberFunction("setFill", LUANATIC_FUNCTION_OVERLOAD(Paint(Item::*)(const stick::String &), &Item::setFill)).
         addMemberFunction("removeFill", LUANATIC_FUNCTION(&Item::removeFill)).
         addMemberFunction("setWindingRule", LUANATIC_FUNCTION(&Item::setWindingRule)).
         addMemberFunction("strokeJoin", LUANATIC_FUNCTION(&Item::strokeJoin)).
@@ -398,6 +413,7 @@ namespace paperLua
         ClassWrapper<Document> docCW("Document");
         docCW.
         addBase<Item>().
+        addConstructor<>().
         addConstructor("new").
         addMemberFunction("createGroup", LUANATIC_FUNCTION(&Document::createGroup)).
         addMemberFunction("createPath", LUANATIC_FUNCTION(&Document::createPath)).
@@ -427,6 +443,7 @@ namespace paperLua
         ClassWrapper<opengl::GLRenderer> glRendererCW("GLRenderer");
         glRendererCW.
         addBase<RenderInterface>().
+        addConstructor<const Document &>().
         addConstructor<const Document &>("new");
 
         namespaceTable.registerClass(glRendererCW);
