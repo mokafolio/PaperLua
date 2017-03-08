@@ -52,9 +52,9 @@ const Suite spec[] =
                 "assert(doc:name() == \"Doc\")\n"
                 "local renderer = GLRenderer.new(doc)\n"
                 "renderer:setViewport(100, 100)\n"
-                "local p = doc:createCircle(Vec2.fromNumbers(100, 100), 10, \"Circle\")\n"
+                "local p = doc:createCircle(Vec2.fromNumbers(100, 100), 10)\n"
                 "local val = p:normalAt(p:length() * 0.5)\n"
-                "p:setFill(ColorRGBA(1, 0, 0, 1))\n";
+                "p:setFill(ColorRGBA.fromNumbers(1.0, 0.0, 0.0, 1.0))\n";
 
             auto err = luanatic::execute(state, basicTest);
             if (err)

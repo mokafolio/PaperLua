@@ -415,11 +415,11 @@ namespace paperLua
         addBase<Item>().
         addConstructor<>().
         addConstructor("new").
-        addMemberFunction("createGroup", LUANATIC_FUNCTION(&Document::createGroup)).
-        addMemberFunction("createPath", LUANATIC_FUNCTION(&Document::createPath)).
-        addMemberFunction("createEllipse", LUANATIC_FUNCTION(&Document::createEllipse)).
-        addMemberFunction("createCircle", LUANATIC_FUNCTION(&Document::createCircle)).
-        addMemberFunction("createRectangle", LUANATIC_FUNCTION(&Document::createRectangle)).
+        addMemberFunction("createGroup", LUANATIC_FUNCTION(&Document::createGroup), "").
+        addMemberFunction("createPath", LUANATIC_FUNCTION(&Document::createPath), "").
+        addMemberFunction("createEllipse", LUANATIC_FUNCTION(&Document::createEllipse), "").
+        addMemberFunction("createCircle", LUANATIC_FUNCTION(&Document::createCircle), "").
+        addMemberFunction("createRectangle", LUANATIC_FUNCTION(&Document::createRectangle), "").
         addMemberFunction("setSize", LUANATIC_FUNCTION(&Document::setSize)).
         addMemberFunction("width", LUANATIC_FUNCTION(&Document::width)).
         addMemberFunction("height", LUANATIC_FUNCTION(&Document::height)).
