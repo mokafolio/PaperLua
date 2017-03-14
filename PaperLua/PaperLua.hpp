@@ -100,6 +100,19 @@ namespace paperLua
             }
             return 1;
         }
+
+        inline Int32 luaClosestCurveLocation(lua_State * _state)
+        {
+            printf("A\n");
+            Path * p = convertToTypeAndCheck<Path>(_state, 1);
+            Float dist;
+            printf("B\n");
+            auto cl = p->closestCurveLocation(luanatic::detail::Converter<const Vec2f&>::convert(_state, 2), dist);
+            luanatic::pushValueType<CurveLocation>(_state, cl);
+            lua_pushnumber(_state, dist);
+            printf("C\n");
+            return 2;
+        }
     }
 
     inline void registerPaper(lua_State * _state, const stick::String & _namespace)
@@ -394,7 +407,7 @@ namespace paperLua
         addMemberFunction("flatten", LUANATIC_FUNCTION(&Path::flatten)).
         addMemberFunction("flattenRegular", LUANATIC_FUNCTION(&Path::flattenRegular)).
         addMemberFunction("regularOffset", LUANATIC_FUNCTION(&Path::regularOffset)).
-        addMemberFunction("closestCurveLocation", LUANATIC_FUNCTION_OVERLOAD(CurveLocation(Path::*)(const Vec2f &) const, &Path::closestCurveLocation)).
+        addMemberFunction("closestCurveLocation", &detail::luaClosestCurveLocation).
         addMemberFunction("curveLocationAt", LUANATIC_FUNCTION(&Path::curveLocationAt)).
         addMemberFunction("length", LUANATIC_FUNCTION(&Path::length)).
         addMemberFunction("area", LUANATIC_FUNCTION(&Path::area)).
