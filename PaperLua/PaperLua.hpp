@@ -25,6 +25,7 @@ namespace paperLua
             return 1;
         }
 
+        //@TODO: Does this still need fixing or can the debug printfs be removed?
         inline Int32 luaEntityCast(lua_State * _state)
         {
             luanatic::detail::LuanaticState * state = luanatic::detail::luanaticState(_state);
@@ -411,6 +412,7 @@ namespace paperLua
         addMemberFunction("curveLocationAt", LUANATIC_FUNCTION(&Path::curveLocationAt)).
         addMemberFunction("length", LUANATIC_FUNCTION(&Path::length)).
         addMemberFunction("area", LUANATIC_FUNCTION(&Path::area)).
+        addMemberFunction("extrema", LUANATIC_FUNCTION_OVERLOAD(stick::DynamicArray<CurveLocation> (Path::*)()const, &Path::extrema)).
         addMemberFunction("isClosed", LUANATIC_FUNCTION(&Path::isClosed)).
         addMemberFunction("isClockwise", LUANATIC_FUNCTION(&Path::isClockwise)).
         addMemberFunction("contains", LUANATIC_FUNCTION(&Path::contains)).
