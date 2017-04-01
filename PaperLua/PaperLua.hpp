@@ -104,15 +104,31 @@ namespace paperLua
 
         inline Int32 luaClosestCurveLocation(lua_State * _state)
         {
-            printf("A\n");
             Path * p = convertToTypeAndCheck<Path>(_state, 1);
             Float dist;
-            printf("B\n");
             auto cl = p->closestCurveLocation(luanatic::detail::Converter<const Vec2f&>::convert(_state, 2), dist);
             luanatic::pushValueType<CurveLocation>(_state, cl);
             lua_pushnumber(_state, dist);
-            printf("C\n");
             return 2;
+        }
+
+        inline Int32 luaIntersections(lua_State * _state)
+        {
+            Path * a = convertToTypeAndCheck<Path>(_state, 1);
+            Path * b = convertToTypeAndCheck<Path>(_state, 2);
+            auto inter = a->intersections(*b);
+            lua_createtable(_state, inter.count(), 0);
+            for(stick::Int32 i = 0; i < inter.count(); ++i)
+            {
+                lua_pushinteger(_state, i + 1);
+                lua_newtable(_state);
+                luanatic::pushValueType<CurveLocation>(_state, inter[i].location);
+                lua_setfield(_state, -2, "location");
+                luanatic::pushValueType<Vec2f>(_state, inter[i].position);
+                lua_setfield(_state, -2, "position");
+                lua_settable(_state, -3);
+            }
+            return 1;
         }
     }
 
@@ -230,7 +246,7 @@ namespace paperLua
         addMemberFunction("isStraight", LUANATIC_FUNCTION(&Curve::isStraight)).
         addMemberFunction("isArc", LUANATIC_FUNCTION(&Curve::isArc)).
         addMemberFunction("isOrthogonal", LUANATIC_FUNCTION(&Curve::isOrthogonal)).
-        addMemberFunction("isColinear", LUANATIC_FUNCTION(&Curve::isColinear)).
+        addMemberFunction("isCollinear", LUANATIC_FUNCTION(&Curve::isCollinear)).
         addMemberFunction("length", LUANATIC_FUNCTION(&Curve::length)).
         addMemberFunction("area", LUANATIC_FUNCTION(&Curve::area)).
         addMemberFunction("divideAt", LUANATIC_FUNCTION(&Curve::divideAt)).
@@ -420,7 +436,8 @@ namespace paperLua
         addMemberFunction("curve", LUANATIC_FUNCTION_OVERLOAD(Curve & (Path::*)(stick::Size), &Path::curve)).
         addMemberFunction("segmentCount", LUANATIC_FUNCTION(&Path::segmentCount)).
         addMemberFunction("curveCount", LUANATIC_FUNCTION(&Path::curveCount)).
-        addMemberFunction("clone", LUANATIC_FUNCTION(&Path::clone));
+        addMemberFunction("clone", LUANATIC_FUNCTION(&Path::clone)).
+        addMemberFunction("intersections", detail::luaIntersections);
 
         namespaceTable.registerClass(pathCW);
         namespaceTable["Path"]["__entityType"].set(stick::TypeInfoT<Path>::typeID());
