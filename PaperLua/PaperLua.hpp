@@ -106,7 +106,7 @@ namespace paperLua
         {
             Path * p = convertToTypeAndCheck<Path>(_state, 1);
             Float dist;
-            auto cl = p->closestCurveLocation(luanatic::detail::Converter<const Vec2f&>::convert(_state, 2), dist);
+            auto cl = p->closestCurveLocation(luanatic::detail::Converter<const Vec2f &>::convert(_state, 2), dist);
             luanatic::pushValueType<CurveLocation>(_state, cl);
             lua_pushnumber(_state, dist);
             return 2;
@@ -118,7 +118,7 @@ namespace paperLua
             Path * b = convertToTypeAndCheck<Path>(_state, 2);
             auto inter = a->intersections(*b);
             lua_createtable(_state, inter.count(), 0);
-            for(stick::Int32 i = 0; i < inter.count(); ++i)
+            for (stick::Int32 i = 0; i < inter.count(); ++i)
             {
                 lua_pushinteger(_state, i + 1);
                 lua_newtable(_state);
@@ -437,7 +437,11 @@ namespace paperLua
         addMemberFunction("segmentCount", LUANATIC_FUNCTION(&Path::segmentCount)).
         addMemberFunction("curveCount", LUANATIC_FUNCTION(&Path::curveCount)).
         addMemberFunction("clone", LUANATIC_FUNCTION(&Path::clone)).
-        addMemberFunction("intersections", detail::luaIntersections);
+        addMemberFunction("intersections", detail::luaIntersections).
+        addMemberFunction("slice", LUANATIC_FUNCTION_OVERLOAD(Path(Path::*)(const CurveLocation &, const CurveLocation &)const, &Path::slice)).
+        addMemberFunction("slice", LUANATIC_FUNCTION_OVERLOAD(Path(Path::*)(Float, Float)const, &Path::slice)).
+        addMemberFunction("sliceAtLocations", LUANATIC_FUNCTION_OVERLOAD(Path(Path::*)(const CurveLocation &, const CurveLocation &)const, &Path::slice)).
+        addMemberFunction("sliceAtOffsets", LUANATIC_FUNCTION_OVERLOAD(Path(Path::*)(Float, Float)const, &Path::slice));
 
         namespaceTable.registerClass(pathCW);
         namespaceTable["Path"]["__entityType"].set(stick::TypeInfoT<Path>::typeID());
