@@ -102,6 +102,70 @@ namespace paperLua
             return 1;
         }
 
+        inline Int32 luaParseSVG(lua_State * _state)
+        {
+            Document * doc = convertToTypeAndCheck<Document>(_state, 1);
+            if (lua_isstring(_state, 2))
+            {
+                svg::SVGImportResult res;
+                if(lua_isnumber(_state, 3))
+                    res = doc->parseSVG(lua_tostring(_state, 2), lua_tonumber(_state, 3));
+                else
+                    res = doc->parseSVG(lua_tostring(_state, 2));
+                if(res)
+                {
+                    lua_newtable(_state);
+                    lua_pushnumber(_state, res.width());
+                    lua_setfield(_state, -2, "width");
+                    lua_pushnumber(_state, res.height());
+                    lua_setfield(_state, -2, "height");
+                    pushValueType<Group>(_state, res.group());
+                    lua_setfield(_state, -2, "height");
+                }
+                else
+                {
+                    pushValueType<Error>(_state, res.error());
+                }
+            }
+            else
+            {
+                luaL_argerror(_state, 1, "String expected.");
+            }
+            return 1;
+        }
+
+        inline Int32 luaLoadSVG(lua_State * _state)
+        {
+            Document * doc = convertToTypeAndCheck<Document>(_state, 1);
+            if (lua_isstring(_state, 2))
+            {
+                svg::SVGImportResult res;
+                if(lua_isnumber(_state, 3))
+                    res = doc->loadSVG(URI(lua_tostring(_state, 2)), lua_tonumber(_state, 3));
+                else
+                    res = doc->loadSVG(URI(lua_tostring(_state, 2)));
+                if(res)
+                {
+                    lua_newtable(_state);
+                    lua_pushnumber(_state, res.width());
+                    lua_setfield(_state, -2, "width");
+                    lua_pushnumber(_state, res.height());
+                    lua_setfield(_state, -2, "height");
+                    pushValueType<Group>(_state, res.group());
+                    lua_setfield(_state, -2, "height");
+                }
+                else
+                {
+                    pushValueType<Error>(_state, res.error());
+                }
+            }
+            else
+            {
+                luaL_argerror(_state, 1, "String expected.");
+            }
+            return 1;
+        }
+
         inline Int32 luaClosestCurveLocation(lua_State * _state)
         {
             Path * p = convertToTypeAndCheck<Path>(_state, 1);
@@ -460,7 +524,9 @@ namespace paperLua
         addMemberFunction("width", LUANATIC_FUNCTION(&Document::width)).
         addMemberFunction("height", LUANATIC_FUNCTION(&Document::height)).
         addMemberFunction("size", LUANATIC_FUNCTION(&Document::size)).
-        addMemberFunction("saveSVG", detail::luaSaveSVG);
+        addMemberFunction("saveSVG", detail::luaSaveSVG).
+        addMemberFunction("parseSVG", detail::luaParseSVG).
+        addMemberFunction("loadSVG", detail::luaLoadSVG);
 
         namespaceTable.registerClass(docCW);
         namespaceTable["Document"]["__entityType"].set(stick::TypeInfoT<Document>::typeID());
