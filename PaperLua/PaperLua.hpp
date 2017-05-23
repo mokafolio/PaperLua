@@ -120,7 +120,7 @@ namespace paperLua
                     lua_pushnumber(_state, res.height());
                     lua_setfield(_state, -2, "height");
                     pushValueType<Group>(_state, res.group());
-                    lua_setfield(_state, -2, "height");
+                    lua_setfield(_state, -2, "group");
                 }
                 else
                 {
@@ -152,7 +152,7 @@ namespace paperLua
                     lua_pushnumber(_state, res.height());
                     lua_setfield(_state, -2, "height");
                     pushValueType<Group>(_state, res.group());
-                    lua_setfield(_state, -2, "height");
+                    lua_setfield(_state, -2, "group");
                 }
                 else
                 {
