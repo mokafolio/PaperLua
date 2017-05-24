@@ -25,28 +25,22 @@ namespace paperLua
             return 1;
         }
 
-        //@TODO: Does this still need fixing or can the debug printfs be removed?
+        //@TODO: Does this still need fixing?
         inline Int32 luaEntityCast(lua_State * _state)
         {
             luanatic::detail::LuanaticState * state = luanatic::detail::luanaticState(_state);
             STICK_ASSERT(state);
-            printf("EC A\n");
             if (lua_istable(_state, 1) && lua_isuserdata(_state, 2))
             {
                 lua_getfield(_state, 1, "__entityType"); // 1 2 et
                 if (lua_isuserdata(_state, -1))
                 {
-                    printf("EC B\n");
                     brick::Entity * e = convertToTypeAndCheck<brick::Entity>(_state, 2);
                     STICK_ASSERT(e);
-                    printf("INFO: %lu %lu %p %p\n", e->id(), e->version(), e->hub(), e);
                     STICK_ASSERT(e->isValid());
-                    printf("EC B2\n");
                     auto maybe = e->maybe<brick::detail::EntityTypeHolder>();
-                    printf("EC C\n");
                     if (maybe && lua_touserdata(_state, -1) == *maybe)
                     {
-                        printf("EC C2\n");
                         lua_pushvalue(_state, 1); // 1 2 et 1
                         lua_setmetatable(_state, -3); // 1 2 et
                         lua_pop(_state, 1); // 1 2
@@ -60,7 +54,6 @@ namespace paperLua
                 }
             }
 
-            printf("EC D\n");
             lua_pushnil(_state); // 1 2 nil
             return 1;
         }
@@ -124,7 +117,9 @@ namespace paperLua
                 }
                 else
                 {
+                    lua_newtable(_state);
                     pushValueType<Error>(_state, res.error());
+                    lua_setfield(_state, -2, "error");
                 }
             }
             else
@@ -156,7 +151,9 @@ namespace paperLua
                 }
                 else
                 {
+                    lua_newtable(_state);
                     pushValueType<Error>(_state, res.error());
+                    lua_setfield(_state, -2, "error");
                 }
             }
             else
@@ -322,6 +319,9 @@ namespace paperLua
 
 
         ClassWrapper<brick::Entity> entityCW("Entity");
+        entityCW.
+        addMemberFunction("id", LUANATIC_FUNCTION(&brick::Entity::id)).
+        addMemberFunction("version", LUANATIC_FUNCTION(&brick::Entity::version));
 
         ClassWrapper<brick::TypedEntity> typedEntityCW("TypedEntity");
         typedEntityCW.
@@ -549,8 +549,6 @@ namespace paperLua
         addConstructor<const Document &>("new");
 
         namespaceTable.registerClass(glRendererCW);
-
-        printf("REGISTER PAPER END \n");
     }
 }
 
