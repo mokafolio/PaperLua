@@ -29,10 +29,9 @@ const Suite spec[] =
             auto err = luanatic::execute(state, basicTest);
             if (err)
                 printf("%s\n", err.message().cString());
+            EXPECT(!err);
 
             EXPECT(lua_gettop(state) == 0);
-
-            EXPECT(!err);
         }
         lua_close(state);
     },

@@ -64,7 +64,10 @@ namespace paperLua
             STICK_ASSERT(state);
             if (lua_isstring(_state, 1))
             {
-                luanatic::push<paper::Document>(_state, state->m_allocator->create<paper::Document>(createDocument(defaultHub(), lua_tostring(_state, 1))), true);
+                printf("BLA\n");
+                auto doc = createDocument(defaultHub(), lua_tostring(_state, 1));
+                printf("BLA2\n");
+                luanatic::push<paper::Document>(_state, state->m_allocator->create<paper::Document>(doc), true);
             }
             else
             {
@@ -101,11 +104,11 @@ namespace paperLua
             if (lua_isstring(_state, 2))
             {
                 svg::SVGImportResult res;
-                if(lua_isnumber(_state, 3))
+                if (lua_isnumber(_state, 3))
                     res = doc->parseSVG(lua_tostring(_state, 2), lua_tonumber(_state, 3));
                 else
                     res = doc->parseSVG(lua_tostring(_state, 2));
-                if(res)
+                if (res)
                 {
                     lua_newtable(_state);
                     lua_pushnumber(_state, res.width());
@@ -135,11 +138,11 @@ namespace paperLua
             if (lua_isstring(_state, 2))
             {
                 svg::SVGImportResult res;
-                if(lua_isnumber(_state, 3))
+                if (lua_isnumber(_state, 3))
                     res = doc->loadSVG(URI(lua_tostring(_state, 2)), lua_tonumber(_state, 3));
                 else
                     res = doc->loadSVG(URI(lua_tostring(_state, 2)));
-                if(res)
+                if (res)
                 {
                     lua_newtable(_state);
                     lua_pushnumber(_state, res.width());
@@ -178,17 +181,22 @@ namespace paperLua
             Path * a = convertToTypeAndCheck<Path>(_state, 1);
             Path * b = convertToTypeAndCheck<Path>(_state, 2);
             auto inter = a->intersections(*b);
-            lua_createtable(_state, inter.count(), 0);
-            for (stick::Int32 i = 0; i < inter.count(); ++i)
+            if (inter.count())
             {
-                lua_pushinteger(_state, i + 1);
-                lua_newtable(_state);
-                luanatic::pushValueType<CurveLocation>(_state, inter[i].location);
-                lua_setfield(_state, -2, "location");
-                luanatic::pushValueType<Vec2f>(_state, inter[i].position);
-                lua_setfield(_state, -2, "position");
-                lua_settable(_state, -3);
+                lua_createtable(_state, inter.count(), 0);
+                for (stick::Int32 i = 0; i < inter.count(); ++i)
+                {
+                    lua_pushinteger(_state, i + 1);
+                    lua_newtable(_state);
+                    luanatic::pushValueType<CurveLocation>(_state, inter[i].location);
+                    lua_setfield(_state, -2, "location");
+                    luanatic::pushValueType<Vec2f>(_state, inter[i].position);
+                    lua_setfield(_state, -2, "position");
+                    lua_settable(_state, -3);
+                }
             }
+            else
+                lua_pushnil(_state);
             return 1;
         }
     }
@@ -198,6 +206,8 @@ namespace paperLua
         using namespace luanatic;
         using namespace paper;
         using namespace stick;
+
+        printf("REGISTER PAPER START\n");
 
         LuaValue g = globalsTable(_state);
         LuaValue namespaceTable = g;
@@ -549,6 +559,8 @@ namespace paperLua
         addConstructor<const Document &>("new");
 
         namespaceTable.registerClass(glRendererCW);
+
+        printf("REG PAPER END\n");
     }
 }
 
