@@ -64,9 +64,7 @@ namespace paperLua
             STICK_ASSERT(state);
             if (lua_isstring(_state, 1))
             {
-                printf("BLA\n");
                 auto doc = createDocument(defaultHub(), lua_tostring(_state, 1));
-                printf("BLA2\n");
                 luanatic::push<paper::Document>(_state, state->m_allocator->create<paper::Document>(doc), true);
             }
             else
@@ -206,8 +204,6 @@ namespace paperLua
         using namespace luanatic;
         using namespace paper;
         using namespace stick;
-
-        printf("REGISTER PAPER START\n");
 
         LuaValue g = globalsTable(_state);
         LuaValue namespaceTable = g;
@@ -559,8 +555,6 @@ namespace paperLua
         addConstructor<const Document &>("new");
 
         namespaceTable.registerClass(glRendererCW);
-
-        printf("REG PAPER END\n");
     }
 }
 
