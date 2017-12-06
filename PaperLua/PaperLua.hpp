@@ -237,11 +237,11 @@ namespace paperLua
         entityTypeTable["Path"].set(EntityType::Path);
         entityTypeTable["Group"].set(EntityType::Group);
 
-        LuaValue paintTypeTable = namespaceTable.findOrCreateTable("PaintType");
-        paintTypeTable["None"].set(PaintType::None);
-        paintTypeTable["Color"].set(PaintType::Color);
-        paintTypeTable["LinearGradient"].set(PaintType::LinearGradient);
-        paintTypeTable["CircularGradient"].set(PaintType::CircularGradient);
+        // LuaValue paintTypeTable = namespaceTable.findOrCreateTable("PaintType");
+        // paintTypeTable["None"].set(PaintType::None);
+        // paintTypeTable["Color"].set(PaintType::Color);
+        // paintTypeTable["LinearGradient"].set(PaintType::LinearGradient);
+        // paintTypeTable["CircularGradient"].set(PaintType::CircularGradient);
 
         LuaValue smoothingTypeTable = namespaceTable.findOrCreateTable("Smoothing");
         smoothingTypeTable["Continuous"].set(Smoothing::Continuous);
@@ -344,32 +344,59 @@ namespace paperLua
         namespaceTable.registerClass(sharedTypedEntityCW);
         namespaceTable.registerFunction("entityCast", detail::luaEntityCast);
 
-        ClassWrapper<Paint> paintCW("Paint");
-        paintCW.
-        addBase<brick::SharedTypedEntity>().
-        addMemberFunction("clone", LUANATIC_FUNCTION(&Paint::clone)).
-        addMemberFunction("paintType", LUANATIC_FUNCTION(&Paint::paintType)).
-        addMemberFunction("remove", LUANATIC_FUNCTION(&Paint::remove));
+        // ClassWrapper<Paint> paintCW("Paint");
+        // paintCW.
+        // addBase<brick::SharedTypedEntity>().
+        // addMemberFunction("clone", LUANATIC_FUNCTION(&Paint::clone)).
+        // addMemberFunction("paintType", LUANATIC_FUNCTION(&Paint::paintType)).
+        // addMemberFunction("remove", LUANATIC_FUNCTION(&Paint::remove));
 
-        namespaceTable.registerClass(paintCW);
+        // namespaceTable.registerClass(paintCW);
 
         ClassWrapper<NoPaint> noPaintCW("NoPaint");
         noPaintCW.
-        addBase<Paint>().
-        addMemberFunction("clone", LUANATIC_FUNCTION(&NoPaint::clone));
+        addConstructor<>();
 
         namespaceTable.registerClass(noPaintCW);
-        namespaceTable["NoPaint"]["__entityType"].set(stick::TypeInfoT<NoPaint>::typeID());
 
-        ClassWrapper<ColorPaint> colorPaintCW("ColorPaint");
-        colorPaintCW.
-        addBase<Paint>().
-        addMemberFunction("clone", LUANATIC_FUNCTION(&ColorPaint::clone)).
-        addMemberFunction("setColor", LUANATIC_FUNCTION(&ColorPaint::setColor)).
-        addMemberFunction("color", LUANATIC_FUNCTION(&ColorPaint::color));
+        ClassWrapper<BaseGradient> baseGradientCW("BaseGradient");
+        baseGradientCW.
+        addConstructor<>().
+        addMemberFunction("setOrigin", LUANATIC_FUNCTION(&BaseGradient::setOrigin)).
+        addMemberFunction("setDestination", LUANATIC_FUNCTION(&BaseGradient::setDestination)).
+        addMemberFunction("addStop", LUANATIC_FUNCTION(&BaseGradient::addStop)).
+        addMemberFunction("origin", LUANATIC_FUNCTION(&BaseGradient::origin)).
+        addMemberFunction("destination", LUANATIC_FUNCTION(&BaseGradient::destination)).
+        addMemberFunction("stops", LUANATIC_FUNCTION(&BaseGradient::stops, ReturnIterator<ph::Result>));
 
-        namespaceTable.registerClass(colorPaintCW);
-        namespaceTable["ColorPaint"]["__entityType"].set(stick::TypeInfoT<ColorPaint>::typeID());
+        namespaceTable.registerClass(baseGradientCW);
+
+
+        ClassWrapper<LinearGradient> linearGradientCW("LinearGradient");
+        linearGradientCW.
+        addBase<BaseGradient>().
+        addConstructor<>();
+
+        namespaceTable.registerClass(linearGradientCW);
+
+        ClassWrapper<RadialGradient> radialGradientCW("RadialGradient");
+        radialGradientCW.
+        addBase<BaseGradient>().
+        addConstructor<>();
+
+        namespaceTable.registerClass(radialGradientCW);
+
+        // namespaceTable["NoPaint"]["__entityType"].set(stick::TypeInfoT<NoPaint>::typeID());
+
+        // ClassWrapper<ColorPaint> colorPaintCW("ColorPaint");
+        // colorPaintCW.
+        // addBase<Paint>().
+        // addMemberFunction("clone", LUANATIC_FUNCTION(&ColorPaint::clone)).
+        // addMemberFunction("setColor", LUANATIC_FUNCTION(&ColorPaint::setColor)).
+        // addMemberFunction("color", LUANATIC_FUNCTION(&ColorPaint::color));
+
+        // namespaceTable.registerClass(colorPaintCW);
+        // namespaceTable["ColorPaint"]["__entityType"].set(stick::TypeInfoT<ColorPaint>::typeID());
 
         ClassWrapper<Item> itemCW("Item");
         itemCW.
@@ -421,15 +448,15 @@ namespace paperLua
         addMemberFunction("setDashArray", LUANATIC_FUNCTION(&Item::setDashArray)).
         addMemberFunction("setDashOffset", LUANATIC_FUNCTION(&Item::setDashOffset)).
         addMemberFunction("setStrokeScaling", LUANATIC_FUNCTION(&Item::setStrokeScaling)).
-        addMemberFunction("setStrokeFromColor", LUANATIC_FUNCTION_OVERLOAD(Paint(Item::*)(const ColorRGBA &), &Item::setStroke)).
-        addMemberFunction("setStrokeFromString", LUANATIC_FUNCTION_OVERLOAD(Paint(Item::*)(const stick::String &), &Item::setStroke)).
-        addMemberFunction("setStroke", LUANATIC_FUNCTION_OVERLOAD(Paint(Item::*)(const ColorRGBA &), &Item::setStroke)).
-        addMemberFunction("setStroke", LUANATIC_FUNCTION_OVERLOAD(Paint(Item::*)(const stick::String &), &Item::setStroke)).
+        addMemberFunction("setStrokeFromColor", LUANATIC_FUNCTION_OVERLOAD(void(Item::*)(const ColorRGBA &), &Item::setStroke)).
+        addMemberFunction("setStrokeFromString", LUANATIC_FUNCTION_OVERLOAD(void(Item::*)(const stick::String &), &Item::setStroke)).
+        addMemberFunction("setStroke", LUANATIC_FUNCTION_OVERLOAD(void(Item::*)(const ColorRGBA &), &Item::setStroke)).
+        addMemberFunction("setStroke", LUANATIC_FUNCTION_OVERLOAD(void(Item::*)(const stick::String &), &Item::setStroke)).
         addMemberFunction("removeStroke", LUANATIC_FUNCTION(&Item::removeStroke)).
-        addMemberFunction("setFillFromColor", LUANATIC_FUNCTION_OVERLOAD(Paint(Item::*)(const ColorRGBA &), &Item::setFill)).
-        addMemberFunction("setFillFromString", LUANATIC_FUNCTION_OVERLOAD(Paint(Item::*)(const stick::String &), &Item::setFill)).
-        addMemberFunction("setFill", LUANATIC_FUNCTION_OVERLOAD(Paint(Item::*)(const ColorRGBA &), &Item::setFill)).
-        addMemberFunction("setFill", LUANATIC_FUNCTION_OVERLOAD(Paint(Item::*)(const stick::String &), &Item::setFill)).
+        addMemberFunction("setFillFromColor", LUANATIC_FUNCTION_OVERLOAD(void(Item::*)(const ColorRGBA &), &Item::setFill)).
+        addMemberFunction("setFillFromString", LUANATIC_FUNCTION_OVERLOAD(void(Item::*)(const stick::String &), &Item::setFill)).
+        addMemberFunction("setFill", LUANATIC_FUNCTION_OVERLOAD(void(Item::*)(const ColorRGBA &), &Item::setFill)).
+        addMemberFunction("setFill", LUANATIC_FUNCTION_OVERLOAD(void(Item::*)(const stick::String &), &Item::setFill)).
         addMemberFunction("removeFill", LUANATIC_FUNCTION(&Item::removeFill)).
         addMemberFunction("setWindingRule", LUANATIC_FUNCTION(&Item::setWindingRule)).
         addMemberFunction("strokeJoin", LUANATIC_FUNCTION(&Item::strokeJoin)).
